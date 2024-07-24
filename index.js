@@ -61,40 +61,55 @@ app.get("/adminlogin",(req,res)=>{
     res.render("index")
 })
 
-app.get("/adminUsers/:adminid",async(req,res)=>{
-    const users = await userModel.find({adminid:req.params.adminid})
-    res.send(users)
-})
+app.get("/adminUsers/:adminid", async (req, res) => {
+    try {
+        const users = await userModel.find({ adminid: req.params.adminid });
+        res.send(users);
+    } catch (error) {
+        console.error('Error fetching users for admin:', error);
+        res.status(500).send('An error occurred while fetching users. Please try again later.');
+    }
+});
 
-app.post("/createadmin",async(req,res)=>{
-    let {adminname,email,password} = req.body
+app.post("/createadmin", async (req, res) => {
+    try {
+        let { adminname, email, password } = req.body;
 
-    let createdAdmin = await adminModel.create({
-        adminname,
-        email,
-        password
-    })
+        let createdAdmin = await adminModel.create({
+            adminname,
+            email,
+            password
+        });
 
-    console.log(createdAdmin);
-    res.send(createdAdmin)
-
-})
+        console.log(createdAdmin);
+        res.send(createdAdmin);
+    } catch (error) {
+        console.error('Error creating admin:', error);
+        res.status(500).send('An error occurred while creating the admin. Please try again later.');
+    }
+});
 
 app.get("/adminloginnew",(req,res)=>{
     res.render("adminlogin")
 
 })
 
-app.post("/loginadmin",async(req,res)=>{
-    let {email}  = req.body
-    let admin = await adminModel.findOne({email:email})
-    console.log(admin);
-    // res.send(admin)
-    req.session.adminid = admin._id
-    res.cookie("admincookie",`${req.session.adminid}`)
-    console.log(req.cookies);
-    res.redirect("/ordersadmin")
-})
+app.post("/loginadmin", async (req, res) => {
+    try {
+        let { email } = req.body;
+        let admin = await adminModel.findOne({ email: email });
+        if (!admin) {
+            return res.status(401).send('Invalid email');
+        }
+        req.session.adminid = admin._id;
+        res.cookie("admincookie", `${req.session.adminid}`);
+        console.log(req.cookies);
+        res.redirect("/ordersadmin");
+    } catch (error) {
+        console.error('Error logging in admin:', error);
+        res.status(500).send('An error occurred while logging in the admin. Please try again later.');
+    }
+});
 
 app.get("/userlogin",(req,res)=>{
     res.render("userlogin")
@@ -104,173 +119,196 @@ app.get("/login",(req,res)=>{
     res.render("loginusernew")
 })
 
-app.post("/loginpage",async(req,res)=>{
-    let {username,password,adminid} = req.body
-    let user = await userModel.findOne({username:username,password:password, adminid:adminid})
-    console.log(user);
-    req.session.userid = user._id
-    console.log(req.session.userid);
-    res.cookie("useridcookie",`${req.session.userid}`)
-    
-    console.log(req.cookies.useridcookie);
-    res.redirect("/usermenu")
-})
+app.post("/loginpage", async (req, res) => {
+    try {
+        let { username, password, adminid } = req.body;
+        let user = await userModel.findOne({ username: username, password: password, adminid: adminid });
+        console.log(user);
+        if (!user) {
+            return res.status(401).send('Invalid username or password');
+        }
+        req.session.userid = user._id;
+        console.log(req.session.userid);
+        res.cookie("useridcookie", `${req.session.userid}`);
+        console.log(req.cookies.useridcookie);
+        res.redirect("/usermenu");
+    } catch (error) {
+        console.error('Error logging in:', error);
+        res.status(500).send('An error occurred while logging in. Please try again later.');
+    }
+});
 
-app.post("/createuser",async(req,res)=>{
-    let {username,email,password,balance,adminid} = req.body
-
-    let createdUser = await userModel.create({
-        username,
-        email,
-        password,
-        balance,
-        adminid
-    })
-
-
-
-    console.log(createdUser);
-    // res.render("usermenu",{user:user})
-    // res.send(createdUser)
-    res.redirect("/usermenu")
-
-})
+app.post("/createuser", async (req, res) => {
+    try {
+        let { username, email, password, balance, adminid } = req.body;
+        let createdUser = await userModel.create({
+            username,
+            email,
+            password,
+            balance,
+            adminid
+        });
+        console.log(createdUser);
+        res.redirect("/usermenu");
+    } catch (error) {
+        console.error('Error creating user:', error);
+        res.status(500).send('An error occurred while creating the user. Please try again later.');
+    }
+});
 
 app.get("/itempost",(req,res)=>{
     res.render("itempost")
 })
 
+app.get("/register", (req, res) => {
+    res.render("registerdisplay");
+});
 
-app.get("/register",(req,res)=>{
-    res.render("registerdisplay")
-})
+app.post("/createItem", authenticateadmin, async (req, res) => {
+    try {
+        let adminid = req.adminkaid;
+        let { itemname, description, price, image, category } = req.body;
 
-app.post("/createItem",authenticateadmin,async(req,res)=>{
+        let createdItem = await menuItemModel.create({
+            adminid,
+            itemname,
+            description,
+            price,
+            image,
+            category
+        });
 
-    let adminid = req.adminkaid
+        console.log(createdItem);
+        res.send(createdItem);
+    } catch (error) {
+        console.error('Error creating item:', error);
+        res.status(500).send('An error occurred while creating the item. Please try again later.');
+    }
+});
 
-    let {itemname,description,price,image,category} = req.body
+app.get("/category", async (req, res) => {
+    try {
+        const items = await menuItemModel.find();
+        // Extract unique categories
+        const categories = [...new Set(items.map(item => item.category))];
 
-    let createdItem = await menuItemModel.create({
-        adminid,
-        itemname,
-        description,
-        price,
-        image,
-        category
-        
-    })
-
-    console.log(createdItem);
-    res.send(createdItem)
-    
-
-})
-
-
-app.get("/category",async(req,res)=>{
-    const item = await menuItemModel.find()
-     // Extract unique categories
-     const categories = [...new Set(items.map(item => item.category))];
-
-     // Render the EJS template with categories and items
-     res.render('category', {categories});
-
-})
-
-
-
-app.get("/usermenu",authenticateuser,async(req,res)=>{
-    
-    const userId = req.userkaid
-    console.log("usermenu id:",userId);
-    const user = await userModel.findOne({_id:userId})
-    const items = await menuItemModel.find({adminid:user.adminid})
-    const categories = [...new Set(items.map(item => item.category))];
-
-    console.log(categories);
-    res.render("usermenu",{items:items,user:user,categories:categories})
-})
-
-app.get("/allmenu",authenticateadmin,async(req,res)=>{
-   const adminid = req.adminkaid
-    const items = await menuItemModel.find({adminid:adminid})
-    res.render("menuitems",{items:items})
-})
-
-app.post("/itemavail/:itemid",async(req,res)=>{
-    const {available}  = req.body
-    const item = await menuItemModel.findByIdAndUpdate({_id:req.params.itemid},{
-        $set:{
-            available:available
-        }
-    },{new:true})
-    console.log(item);
-    res.send(item)
-})
+        // Render the EJS template with categories and items
+        res.render('category', { categories });
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        res.status(500).send('An error occurred while fetching categories. Please try again later.');
+    }
+});
 
 
+app.get("/usermenu", authenticateuser, async (req, res) => {
+    try {
+        const userId = req.userkaid;
+        console.log("usermenu id:", userId);
+        const user = await userModel.findOne({ _id: userId });
+        const items = await menuItemModel.find({ adminid: user.adminid });
+        const categories = [...new Set(items.map(item => item.category))];
 
-app.post('/order',authenticateuser, async (req, res) => {
-    const userId = req.userkaid
-   
+        console.log(categories);
+        res.render("usermenu", { items: items, user: user, categories: categories });
+    } catch (error) {
+        console.error('Error fetching user menu:', error);
+        res.status(500).send('An error occurred while fetching the user menu. Please try again later.');
+    }
+});
+
+app.get("/allmenu", authenticateadmin, async (req, res) => {
+    try {
+        const adminid = req.adminkaid;
+        const items = await menuItemModel.find({ adminid: adminid });
+        res.render("menuitems", { items: items });
+    } catch (error) {
+        console.error('Error fetching admin menu:', error);
+        res.status(500).send('An error occurred while fetching the admin menu. Please try again later.');
+    }
+});
+
+app.post("/itemavail/:itemid", async (req, res) => {
+    try {
+        const { available } = req.body;
+        const item = await menuItemModel.findByIdAndUpdate(
+            { _id: req.params.itemid },
+            {
+                $set: {
+                    available: available
+                }
+            },
+            { new: true }
+        );
+        console.log(item);
+        res.send(item);
+    } catch (error) {
+        console.error('Error updating item availability:', error);
+        res.status(500).send('An error occurred while updating the item availability. Please try again later.');
+    }
+});
+
+
+app.post('/order', authenticateuser, async (req, res) => {
+    const userId = req.userkaid;
     const itemsOrder = [];
 
-    // Iterate over items selected in the form and construct itemsOrder array
-    Object.keys(req.body).forEach(key => {
-        if (key.startsWith('menu_')) {
-            const menuId = req.body[key];
-            const quantityKey = `quantity_${menuId}`;
-            const quantity = req.body[quantityKey];
-            const priceKey = `price_${menuId}`;
-            const price = req.body[priceKey];
+    try {
+        // Iterate over items selected in the form and construct itemsOrder array
+        Object.keys(req.body).forEach(key => {
+            if (key.startsWith('menu_')) {
+                const menuId = req.body[key];
+                const quantityKey = `quantity_${menuId}`;
+                const quantity = req.body[quantityKey];
+                const priceKey = `price_${menuId}`;
+                const price = req.body[priceKey];
 
-            // Validate and push to itemsOrder array
-            if (quantity && !isNaN(quantity) && parseInt(quantity) > 0) {
-                itemsOrder.push({ menuId, quantity: parseInt(quantity),
-                price: parseFloat(price)
-                 });
+                // Validate and push to itemsOrder array
+                if (quantity && !isNaN(quantity) && parseInt(quantity) > 0) {
+                    itemsOrder.push({
+                        menuId,
+                        quantity: parseInt(quantity),
+                        price: parseFloat(price)
+                    });
+                }
             }
-        }
-    });
+        });
 
-    console.log(itemsOrder);
-    // res.send(itemsOrder);
+        console.log(itemsOrder);
 
-    let totalPrice = 0;
-    itemsOrder.forEach(item => {
-     
-        totalPrice += item.price * item.quantity;
-    });
+        let totalPrice = 0;
+        itemsOrder.forEach(item => {
+            totalPrice += item.price * item.quantity;
+        });
 
-    
         // Retrieve user from database
         const user = await userModel.findById(userId);
-    
         if (!user) {
-          return res.status(404).send('User not found');
+            return res.status(404).send('User not found');
         }
-    
+
         // Check if user balance is sufficient
         if (totalPrice > user.balance) {
-          return res.status(400).send('Insufficient balance to place the order.');
+            return res.status(400).send('Insufficient balance to place the order.');
         }
-    
+
         // Deduct totalPrice from user's balance
         user.balance -= totalPrice;
         await user.save();
 
-    const order = await orderModel.create({
-        userId,
-        itemsOrder,
-        totalPrice,
+        // Create the order
+        const order = await orderModel.create({
+            userId,
+            itemsOrder,
+            totalPrice,
+        });
 
-    });
-
-        
-    console.log(order);
-    res.redirect("/userorders")
-    // res.send(order)
+        console.log(order);
+        res.redirect("/userorders");
+    } catch (error) {
+        console.error('Error processing order:', error);
+        res.status(500).send('An error occurred while processing your order. Please try again later.');
+    }
 });
 
 // app.post('/order', authenticateuser, async (req, res) => {
@@ -448,29 +486,52 @@ app.post('/order',authenticateuser, async (req, res) => {
 
 
 
-app.get("/ordersadmin",authenticateadmin,async(req,res)=>{
-    let adminId = req.adminkaid
-    // const order = await orderModel.find().populate('itemsOrder.menuId').sort({ orderDate: -1 });
-    // Find users with the specified adminid
-    const users = await userModel.find({ adminid: adminId }).select('_id');
-    const userIds = users.map(user => user._id);
+app.get("/ordersadmin", authenticateadmin, async (req, res) => {
+    try {
+        let adminId = req.adminkaid;
+        
+        // Find users with the specified adminid
+        const users = await userModel.find({ adminid: adminId }).select('_id');
+        const userIds = users.map(user => user._id);
 
-    // Find orders for those users
-    const order = await orderModel.find({ userId: { $in: userIds } }).populate('itemsOrder.menuId').sort({ orderDate: -1 });
-    console.log(order);
-    res.render("ordersadmin",{order:order})
-})
+        // Find orders for those users
+        const order = await orderModel.find({ userId: { $in: userIds } }).populate('itemsOrder.menuId').sort({ orderDate: -1 });
+        console.log(order);
 
-app.get("/userorders",authenticateuser,async(req,res)=>{
-    const userId = req.userkaid
-    console.log("ID:",userId);
-    const orders = await orderModel.find({userId:userId}).populate('itemsOrder.menuId').sort({ orderDate: -1 });
-    console.log("kutte:",orders);
+        res.render("ordersadmin", { order: order });
+    } catch (error) {
+        console.error("Error retrieving orders for admin:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
 
-    // const user = await userModel.findOne({_id:userId})
-    // console.log(user);
-    res.render("userorders",{orders:orders})
-})
+// app.get("/userorders",authenticateuser,async(req,res)=>{
+//     const userId = req.userkaid
+//     console.log("ID:",userId);
+//     const orders = await orderModel.find({userId:userId}).populate('itemsOrder.menuId').sort({ orderDate: -1 });
+//     console.log("kutte:",orders);
+
+//     // const user = await userModel.findOne({_id:userId})
+//     // console.log(user);
+//     res.render("userorders",{orders:orders})
+// })
+app.get("/userorders", authenticateuser, async (req, res) => {
+    try {
+        const userId = req.userkaid;
+        console.log("ID:", userId);
+        const orders = await orderModel.find({ userId: userId }).populate('itemsOrder.menuId').sort({ orderDate: -1 });
+        console.log("Orders:", orders);
+
+        // const user = await userModel.findOne({ _id: userId });
+        // console.log(user);
+
+        res.render("userorders", { orders: orders });
+    } catch (error) {
+        console.error("Error retrieving user orders:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
 // app.get('/userorders', authenticateuser, async (req, res) => {
 //     const userId = req.userkaid;
 
@@ -585,12 +646,31 @@ app.get("/userorders",authenticateuser,async(req,res)=>{
 // });
 
 
-app.get("/updatebalance",authenticateuser,async(req,res)=>{
-    const userId = req.userkaid
-    console.log("usermenu id:",userId);
-    const user = await userModel.findOne({_id:userId})
-    res.render("updatebalance",{user:user})
-})
+// app.get("/updatebalance",authenticateuser,async(req,res)=>{
+//     const userId = req.userkaid
+//     console.log("usermenu id:",userId);
+//     const user = await userModel.findOne({_id:userId})
+//     res.render("updatebalance",{user:user})
+// })
+
+app.get("/updatebalance", authenticateuser, async (req, res) => {
+    try {
+        const userId = req.userkaid;
+        console.log("usermenu id:", userId);
+        const user = await userModel.findOne({_id: userId});
+        
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
+        res.render("updatebalance", { user: user });
+    } catch (error) {
+        console.error("Error updating balance:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
 app.post("/balanceUpdate",authenticateuser, async (req, res) => {
     const { balance } = req.body;
     const userId = req.userkaid;
@@ -620,21 +700,39 @@ app.post("/balanceUpdate",authenticateuser, async (req, res) => {
 
 
 
-app.post("/orderstatus/:orderid",async(req,res)=>{
-    const {status}=req.body
-    const order = await orderModel.findByIdAndUpdate({_id:req.params.orderid},{
-        $set:{
-            status:status
+app.post("/orderstatus/:orderid", async (req, res) => {
+    try {
+        const { status } = req.body;
+        const order = await orderModel.findByIdAndUpdate(
+            { _id: req.params.orderid },
+            {
+                $set: {
+                    status: status
+                }
+            },
+            { new: true }
+        );
+
+        if (!order) {
+            return res.status(404).send("Order not found");
         }
-    },{new:true})
 
-    console.log(order);
-    res.redirect("/ordersadmin")
-})
+        console.log(order);
+        res.redirect("/ordersadmin");
+    } catch (error) {
+        console.error("Error updating order status:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
 
-app.get("/",(req,res)=>{
-    res.send("Hello Bro")
-})
+app.get("/", (req, res) => {
+    try {
+        res.send("Hello Bro");
+    } catch (error) {
+        console.error("Error sending greeting:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
 
 app.post('/userordercancel', async (req, res) => {
     try {
@@ -661,25 +759,37 @@ app.post('/userordercancel', async (req, res) => {
 
 
 //rewards model
-app.get("/rewardpage",async(req,res)=>{
-    res.render("rewardpage")
-})
-app.post("/rewardpost",authenticateadmin,async(req,res)=>{
-    const adminid = req.adminkaid
-    const {minAmount,points,description,expiryDate,category} = req.body
+app.get("/rewardpage", async (req, res) => {
+    try {
+        res.render("rewardpage");
+    } catch (error) {
+        console.error("Error rendering reward page:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
 
-    const reward = await rewardsModel.create({
-        adminid,
-        minAmount,
-        points,
-        description,
-        expiryDate,
-        category
-    })
+app.post("/rewardpost", authenticateadmin, async (req, res) => {
+    try {
+        const adminid = req.adminkaid;
+        const { minAmount, points, description, expiryDate, category } = req.body;
 
-    console.log(reward);
-    res.send(reward)
-})
+        const reward = await rewardsModel.create({
+            adminid,
+            minAmount,
+            points,
+            description,
+            expiryDate,
+            category
+        });
+
+        console.log(reward);
+        res.send(reward);
+    } catch (error) {
+        console.error("Error creating reward:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
 app.get("/rewarddisplay", authenticateuser, async (req, res) => {
     try {
         const userId = req.userkaid;
@@ -714,15 +824,25 @@ app.get("/rewarddisplay", authenticateuser, async (req, res) => {
         res.status(500).send("Error fetching rewards");
     }
 });
+app.get("/rewardOrderspage", authenticateuser, async (req, res) => {
+    try {
+        const userId = req.userkaid;
+        const user = await userModel.findOne({ _id: userId });
 
-app.get("/rewardOrderspage",authenticateuser,async(req,res)=>{
-    const userId = req.userkaid
-    const user = await userModel.findOne({_id:userId})
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
 
-    const rewardOrders = await rewardorderModel.find({userId:userId}).populate("itemsOrder.itemId")
-    console.log("bakchodi:",rewardOrders);
-    res.render("rewardorderdisplay",{rewardOrders:rewardOrders,user:user})
-})
+        const rewardOrders = await rewardorderModel.find({ userId: userId }).populate("itemsOrder.itemId");
+        console.log("Reward Orders:", rewardOrders);
+
+        res.render("rewardorderdisplay", { rewardOrders: rewardOrders, user: user });
+    } catch (error) {
+        console.error("Error retrieving reward orders:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
 
 
 app.post("/rewardcollect/:rewardId", authenticateuser, async (req, res) => {
@@ -803,56 +923,60 @@ app.get("/rewardItemcreate", async(req,res)=>{
     res.render("rewardItemcreate")
 })
 
-app.post("/rewardorder",authenticateuser,async(req,res)=>{
-    const userId = req.userkaid;
-   
-    const itemsOrder = [];
+app.post("/rewardorder", authenticateuser, async (req, res) => {
+    try {
+        const userId = req.userkaid;
+        const itemsOrder = [];
 
-    // Iterate over items selected in the form and construct itemsOrder array
-    Object.keys(req.body).forEach(key => {
-        if (key.startsWith('reward_')) {
-            const rewardId = req.body[key];
-            const pointsRequired = req.body[`points_${rewardId}`];
-            const quantity = 1; // Assuming 1 item per order, adjust if needed
+        // Iterate over items selected in the form and construct itemsOrder array
+        Object.keys(req.body).forEach(key => {
+            if (key.startsWith('reward_')) {
+                const rewardId = req.body[key];
+                const pointsRequired = req.body[`points_${rewardId}`];
+                const quantity = 1; // Assuming 1 item per order, adjust if needed
 
-            // Validate and push to itemsOrder array
-            if (pointsRequired && !isNaN(pointsRequired) && parseInt(pointsRequired) > 0) {
-                itemsOrder.push({ itemId: rewardId, quantity, pointsRequired: parseInt(pointsRequired) });
+                // Validate and push to itemsOrder array
+                if (pointsRequired && !isNaN(pointsRequired) && parseInt(pointsRequired) > 0) {
+                    itemsOrder.push({ itemId: rewardId, quantity, pointsRequired: parseInt(pointsRequired) });
+                }
             }
+        });
+
+        // Calculate total points required
+        let totalPointsRequired = 0;
+        itemsOrder.forEach(item => {
+            totalPointsRequired += item.pointsRequired * item.quantity;
+        });
+
+        // Retrieve user from database
+        const user = await userModel.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
         }
-    });
 
-    // Calculate total points required
-    let totalPointsRequired = 0;
-    itemsOrder.forEach(item => {
-        totalPointsRequired += item.pointsRequired * item.quantity;
-    });
+        // Check if user reward points are sufficient
+        if (totalPointsRequired > user.rewardPoints) {
+            return res.status(400).send('Insufficient reward points to place the order.');
+        }
 
-    // Retrieve user from database
-    const user = await userModel.findById(userId);
-    
-    if (!user) {
-        return res.status(404).send('User not found');
+        // Deduct points from user's reward points
+        user.rewardPoints -= totalPointsRequired;
+        await user.save();
+
+        // Create the reward order
+        const order = await rewardorderModel.create({
+            userId,
+            itemsOrder,
+            totalPointsRequired,
+        });
+
+        res.redirect("/rewardOrderspage");
+        console.log(order);
+    } catch (error) {
+        console.error("Error placing reward order:", error);
+        res.status(500).send("Internal Server Error");
     }
-
-    // Check if user reward points are sufficient
-    if (totalPointsRequired > user.rewardPoints) {
-        return res.status(400).send('Insufficient reward points to place the order.');
-    }
-
-    // Deduct points from user's reward points
-    user.rewardPoints -= totalPointsRequired;
-    await user.save();
-
-    // Create the reward order
-    const order = await rewardorderModel.create({
-        userId,
-        itemsOrder,
-        totalPointsRequired,
-    });
-
-    res.send(order);
-})
+});
 
 app.post("/updateStatusadmin/:orderId",async(req,res)=>{
     try {
@@ -867,30 +991,46 @@ app.post("/updateStatusadmin/:orderId",async(req,res)=>{
         res.status(500).send('Internal Server Error');
     }
 })
+app.get("/rewardItems", authenticateuser, async (req, res) => {
+    try {
+        const userid = req.userkaid;
+        const user = await userModel.findOne({ _id: userid });
 
-app.get("/rewardItems",authenticateuser,async(req,res)=>{
-    const userid = req.userkaid
-    const user = await userModel.findOne({_id:userid})
-    console.log(user);
-    const rewardItem = await rewardItemModel.find({adminId:user.adminid});
-    console.log(rewardItem);
-    res.render("rewardItemdisplay",{rewardItem:rewardItem,user:user})
-})
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
 
-app.post("/rewardItempost",authenticateadmin,async(req,res)=>{
-    const {itemName,description,pointsRequired,image} = req.body
-    const adminId = req.adminkaid
-    const rewardItem = await rewardItemModel.create({
-        itemName,
-        description,
-        pointsRequired,
-        image,
-        adminId
-    })
-    console.log(rewardItem);
-    res.send(rewardItem)
+        console.log(user);
+        const rewardItem = await rewardItemModel.find({ adminId: user.adminid });
+        console.log(rewardItem);
+        res.render("rewardItemdisplay", { rewardItem: rewardItem, user: user });
+    } catch (error) {
+        console.error("Error retrieving reward items:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
 
-})
+app.post("/rewardItempost", authenticateadmin, async (req, res) => {
+    try {
+        const { itemName, description, pointsRequired, image } = req.body;
+        const adminId = req.adminkaid;
+
+        const rewardItem = await rewardItemModel.create({
+            itemName,
+            description,
+            pointsRequired,
+            image,
+            adminId
+        });
+
+        console.log(rewardItem);
+        res.send(rewardItem);
+    } catch (error) {
+        console.error("Error creating reward item:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
 
 
 app.listen(5000)
