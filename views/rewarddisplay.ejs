@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rewards</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-gray-800 text-white shadow-md">
+        <div class="container mx-auto flex items-center justify-between p-4">
+            <!-- Logo -->
+            <a href="#" class="text-2xl font-bold">MealMate</a>
+
+            <!-- Navigation Links -->
+            <div class="hidden md:flex space-x-4">
+                <a href="/" class="hover:bg-gray-700 px-3 py-2 rounded">Home</a>
+                <a href="/menu" class="hover:bg-gray-700 px-3 py-2 rounded">Menu</a>
+                <a href="/orders" class="hover:bg-gray-700 px-3 py-2 rounded">Orders</a>
+                <a href="/profile" class="hover:bg-gray-700 px-3 py-2 rounded">Profile</a>
+                <a href="/logout" class="hover:bg-gray-700 px-3 py-2 rounded">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-8">
+        <h1 class="text-2xl font-bold mb-4">Your Rewards:<%=user.rewardPoints%></h1>
+
+        <h1 class="text-2xl font-bold mb-4">Available Rewards</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% rewards.forEach(reward => { %>
+                <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                    <div class="p-4">
+                        <h2 class="text-xl font-semibold mb-2">Reward: <%= reward.description %></h2>
+                        <p class="text-gray-700 mb-2">Points: <%= reward.points %></p>
+                        <p class="text-gray-700 mb-2">Minimum Amount: $<%= reward.minAmount %></p>
+                        <p class="text-gray-700 mb-2">Expiry Date: <%= reward.expiryDate ? new Date(reward.expiryDate).toLocaleDateString() : 'No Expiry' %></p>
+                        <% if (!user.collectedRewards.includes(reward._id.toString())) { %>
+                            <form action="/rewardcollect/<%=reward._id%>" method="post" class="mt-4">
+                              
+                                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                    Collect Reward
+                                </button>
+                            </form>
+                        <% } else { %>
+                            <p class="text-red-500 mt-4">Reward already collected</p>
+                        <% } %>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+</body>
+</html>

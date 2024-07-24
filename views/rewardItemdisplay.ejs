@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reward Items</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-gray-800 text-white shadow-md">
+        <div class="container mx-auto flex items-center justify-between p-4">
+            <a href="#" class="text-2xl font-bold">MealMate</a>
+            <div class="hidden md:flex space-x-4">
+                <a href="/" class="hover:bg-gray-700 px-3 py-2 rounded">Home</a>
+                <a href="/menu" class="hover:bg-gray-700 px-3 py-2 rounded">Menu</a>
+                <a href="/userorders" class="hover:bg-gray-700 px-3 py-2 rounded">Orders</a>
+                <a href="/profile" class="hover:bg-gray-700 px-3 py-2 rounded">Profile</a>
+                <a href="/logout" class="hover:bg-gray-700 px-3 py-2 rounded">Logout</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-200 hover:text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="md:hidden bg-gray-700 hidden">
+            <a href="/" class="block px-4 py-2 text-white hover:bg-gray-600">Home</a>
+            <a href="/menu" class="block px-4 py-2 text-white hover:bg-gray-600">Menu</a>
+            <a href="/orders" class="block px-4 py-2 text-white hover:bg-gray-600">Orders</a>
+            <a href="/profile" class="block px-4 py-2 text-white hover:bg-gray-600">Profile</a>
+            <a href="/logout" class="block px-4 py-2 text-white hover:bg-gray-600">Logout</a>
+        </div>
+    </nav>
+    <div class="container mx-auto p-8">
+        <div class="flex justify-between">
+            <h1 class="text-2xl font-bold mb-4">Reward Items</h1>
+            <h1 class="text-2xl font-bold mb-4">Your Reward Points: <%= user.rewardPoints %></h1>
+        </div>
+
+        <!-- Form for ordering reward items -->
+        <form action="/rewardorder" method="post" onsubmit="return validateRewardOrder()">
+            <div id="reward-items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <% rewardItem.forEach(val => { %>
+                    <div class="reward-item bg-white shadow-md rounded-lg overflow-hidden">
+                        <img class="w-full h-48 object-cover" src="<%= val.image %>" alt="Item image">
+                        <div class="p-4">
+                            <h2 class="text-xl font-semibold mb-2"><%= val.itemName %></h2>
+                            <p class="text-gray-700 mb-2">Points Required: <%= val.pointsRequired %></p>
+                            <input type="hidden" name="points_<%= val._id %>" value="<%= val.pointsRequired %>">
+                            <div class="flex items-center mb-2">
+                                <input class="mr-2" type="checkbox" id="reward_<%= val._id %>" name="reward_<%= val._id %>" value="<%= val._id %>">
+                                <label for="reward_<%= val._id %>" class="text-gray-700">Select</label>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+            <div class="fixed bottom-8 right-8">
+                <input class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-10 rounded shadow-md" type="submit" value="Order">
+            </div>
+        </form>
+    </div>
+    <script>
+        // Toggle mobile menu visibility
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            var menu = document.getElementById('mobile-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+            }
+        });
+
+        function validateRewardOrder() {
+            // Get the user's reward points
+            const userRewardPoints = <%= user.rewardPoints %>;
+
+            // Calculate the total points required for selected items
+            let totalPointsRequired = 0;
+            const items = document.querySelectorAll('input[type="checkbox"]:checked');
+            items.forEach(item => {
+                const rewardId = item.value;
+                const pointsRequired = parseInt(document.querySelector(`input[name="points_${rewardId}"]`).value);
+
+                if (!isNaN(pointsRequired) && pointsRequired > 0) {
+                    totalPointsRequired += pointsRequired;
+                }
+            });
+
+            // Check if total points required exceeds user reward points
+            if (totalPointsRequired > userRewardPoints) {
+                alert('Insufficient reward points to place the order');
+                return false; // Prevent form submission
+            }
+
+            return true; // Allow form submission
+        }
+    </script>
+</body>
+</html>

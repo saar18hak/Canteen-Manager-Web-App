@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Orders</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-gray-800 text-white shadow-md">
+        <div class="container mx-auto flex items-center justify-between p-4">
+            <!-- Logo -->
+            <a href="#" class="text-2xl font-bold">MealMate</a>
+
+            <!-- Navigation Links -->
+            <div class="hidden md:flex space-x-4">
+                <a href="/" class="hover:bg-gray-700 px-3 py-2 rounded">Home</a>
+                <a href="/usermenu" class="hover:bg-gray-700 px-3 py-2 rounded">Menu</a>
+                <a href="/userorders" class="hover:bg-gray-700 px-3 py-2 rounded">Orders</a>
+                <a href="/updatebalance" class="hover:bg-gray-700 px-3 py-2 rounded">Update Balance</a>
+                <a href="/profile" class="hover:bg-gray-700 px-3 py-2 rounded">Profile</a>
+                <a href="/login" class="hover:bg-gray-700 px-3 py-2 rounded">Logout</a>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden text-gray-200 hover:text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden bg-gray-700 hidden">
+            <a href="/" class="block px-4 py-2 text-white hover:bg-gray-600">Home</a>
+            <a href="/menu" class="block px-4 py-2 text-white hover:bg-gray-600">Menu</a>
+            <a href="/orders" class="block px-4 py-2 text-white hover:bg-gray-600">Orders</a>
+            <a href="/profile" class="block px-4 py-2 text-white hover:bg-gray-600">Profile</a>
+            <a href="/logout" class="block px-4 py-2 text-white hover:bg-gray-600">Logout</a>
+        </div>
+    </nav>
+    <div class="container mx-auto p-8">
+        <h1 class="text-2xl font-bold mb-4">Your Orders</h1>
+
+        <!-- Status Filter Form -->
+        <form id="filterForm" class="mb-6">
+            <label for="status" class="text-lg font-semibold mr-4">Filter by Status:</label>
+            <select id="status" class="border border-gray-300 rounded py-2 px-4">
+                <option value="">All</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+            <button type="button" onclick="filterOrders()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-4">Apply Filter</button>
+        </form>
+
+        <!-- Orders List -->
+        <div id="ordersContainer">
+            <% orders.forEach(function(order) { %>
+                <div class="order bg-white shadow-md rounded-lg p-4 mb-4" data-status="<%= order.status %>">
+                    <h2 class="text-xl font-semibold mb-2">Order ID: <%= order._id %></h2>
+                    <p class="text-gray-700 mb-2">Total Price: $<%= order.totalPrice %></p>
+                    <p class="text-gray-700 mb-2">Status: 
+                        <% if (order.status === 'cancelled') { %>
+                            <span class="text-red-500">Cancelled</span>
+                        <% } else if (order.status === 'completed') { %>
+                            <span class="text-green-500">Completed</span>
+                        <% } else { %>
+                            <span class="text-yellow-500">Pending</span>
+                        <% } %>
+                    </p>
+                    <p class="text-gray-700 mb-2">Order Date: <%= new Date(order.orderDate).toLocaleDateString() %></p>
+                    <% if (order.status !== 'cancelled') { %>
+                        <form action="/userordercancel" method="post">
+                            <input type="hidden" name="orderid" value="<%= order._id %>">
+                            <input type="hidden" name="status" value="cancelled">
+                            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Cancel Order</button>
+                        </form>
+                    <% } %>
+
+                    <div class="mt-4">
+                        <% order.itemsOrder.forEach(function(item) { %>
+                            <div class="bg-gray-100 p-4 mb-2 rounded-lg">
+                                <h3 class="text-lg font-semibold mb-1"><%= item.menuId.itemname %></h3>
+                                <p class="text-gray-600 mb-1">Price: $<%= item.menuId.price %></p>
+                                <p class="text-gray-600 mb-1">Quantity: <%= item.quantity %></p>
+                                <img class="w-24 h-24 object-cover mt-2" src="<%= item.menuId.image %>" alt="<%= item.menuId.itemname %>">
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+
+    <script>
+        function filterOrders() {
+            const selectedStatus = document.getElementById('status').value;
+            const orders = document.querySelectorAll('.order');
+            
+            orders.forEach(order => {
+                const orderStatus = order.getAttribute('data-status');
+                
+                if (selectedStatus === '' || selectedStatus === orderStatus) {
+                    order.style.display = 'block'; // Show order
+                } else {
+                    order.style.display = 'none'; // Hide order
+                }
+            });
+        }
+
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            var menu = document.getElementById('mobile-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-800">
+    <!-- <h1>Hello World</h1> -->
+    <!-- <form action="/createuser" method="post">
+        <input type="text" placeholder="Name" name="username">
+        <input type="text" placeholder="email" name="email">
+        <input type="text" placeholder="password" name="password">
+         <input type="text" placeholder="balance" name="balance">
+    <input type="text" placeholder="adminid" name="adminid">
+        <input type="submit"  value="Login" />
+    </form> -->
+
+    
+
+<form class="max-w-sm mx-auto " action="/createuser" method="post">
+    <div class="">
+    <div class="mb-5 pt-10" >
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+        <input type="text" placeholder="Name" name="username" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"  />
+      </div>
+    <div class="mb-5">
+      <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+      <input type="text" placeholder="email" name="email" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"  />
+    </div>
+    <div class="mb-5">
+      <label  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your password</label>
+      <input type="text" placeholder="password" name="password" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"  />
+    </div>
+    <div class="mb-5">
+        <label  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Admin Referral Code</label>
+        <input type="text" placeholder="Admin Referral Code" name="adminid" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"  />
+      </div>
+    </div>
+
+    <div class="">
+    <div class="mb-5">
+      <label  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Balance </label>
+      <input type="text" type="number" placeholder="balance" name="balance" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"  />
+        <!-- <p>credit card</p> -->
+      <div class="mx-auto max-w-lg mt-5">
+        <div class="bg-white rounded-lg overflow-hidden shadow-lg">
+            <div class="px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <img class="h-8" src="https://www.svgrepo.com/show/499847/company.svg" alt="Workflow logo">
+                    <span class="font-medium text-gray-600"><input type="text" placeholder="EXPIRY DATE"></span>
+                </div>
+                <div class="mt-4">
+                    <div class="font-bold text-gray-800 text-xl">
+                        <input type="text" placeholder="CARD NUMBER">
+                    </div>
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="text-sm text-gray-600">
+                            <input type="text" placeholder="CARDHOLDER NAME">
+                        </div>
+                        <img class="h-10 w-10" src="https://www.svgrepo.com/show/362011/mastercard.svg" alt="Mastercard logo">
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-100 px-6 py-4">
+                <div class="font-medium text-gray-600 "><input type="text" placeholder="CARD VERIFICATION VALUE" class="w-full"></div>
+                <!-- <div class="text-lg font-bold text-gray-800 mt-2">***</div> -->
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="flex items-start mb-5">
+      <div class="flex items-center h-5">
+        <input id="terms" type="checkbox" value="" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800" required />
+      </div>
+      <label for="terms" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">I agree with the <a href="#" class="text-blue-600 hover:underline dark:text-blue-500">terms and conditions</a></label>
+    </div>
+    <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Register new account</button>
+    </div>
+  </form>
+  
+</body>
+</html>

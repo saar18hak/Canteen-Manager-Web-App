@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Balance</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-6">Update Balance</h1>
+        <form action="/balanceUpdate" method="post" onsubmit="return validateBalance()">
+            <div class="mb-4">
+                <h1 class="block text-gray-700 font-semibold mb-2">Current Balance:<%=user.balance%></h1>
+               
+            </div>
+
+            <div class="mb-4">
+                <label for="new-balance" class="block text-gray-700 font-semibold mb-2">New Balance:</label>
+                <input id="new-balance" type="number" name="balance" placeholder="Enter new balance" class="w-full px-4 py-2 border border-gray-300 rounded" required>
+            </div>
+
+            <div class="flex justify-between items-center mb-6">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Update Balance</button>
+                
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function validateBalance() {
+            const newBalance = parseFloat(document.getElementById('new-balance').value);
+            if (isNaN(newBalance) || newBalance <= 0) {
+                alert('Please enter a valid positive amount.');
+                return false; // Prevent form submission
+            }
+            return true; // Allow form submission
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Reward Orders</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-gray-800 text-white shadow-md">
+        <div class="container mx-auto flex items-center justify-between p-4">
+            <a href="#" class="text-2xl font-bold">MealMate</a>
+            <div class="hidden md:flex space-x-4">
+                <a href="/" class="hover:bg-gray-700 px-3 py-2 rounded">Home</a>
+                <a href="/usermenu" class="hover:bg-gray-700 px-3 py-2 rounded">Menu</a>
+                <a href="/userorders" class="hover:bg-gray-700 px-3 py-2 rounded">Orders</a>
+                <a href="/profile" class="hover:bg-gray-700 px-3 py-2 rounded">Profile</a>
+                <a href="/logout" class="hover:bg-gray-700 px-3 py-2 rounded">Logout</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-200 hover:text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="md:hidden bg-gray-700 hidden">
+            <a href="/" class="block px-4 py-2 text-white hover:bg-gray-600">Home</a>
+            <a href="/usermenu" class="block px-4 py-2 text-white hover:bg-gray-600">Menu</a>
+            <a href="/orders" class="block px-4 py-2 text-white hover:bg-gray-600">Orders</a>
+            <a href="/profile" class="block px-4 py-2 text-white hover:bg-gray-600">Profile</a>
+            <a href="/logout" class="block px-4 py-2 text-white hover:bg-gray-600">Logout</a>
+        </div>
+    </nav>
+    <div class="container mx-auto p-8">
+        <div class="flex justify-between">
+        <h1 class="text-2xl font-bold mb-4">My Reward Orders</h1>
+        <h1 class="text-2xl font-bold mb-4">Reward Points:<%=user.rewardPoints%></h1>
+    </div>
+        <!-- Reward Orders Display -->
+        <% if (rewardOrders && rewardOrders.length > 0) { %>
+            <div class="space-y-6">
+                <% rewardOrders.forEach(order => { %>
+                    <div class="bg-white shadow-md rounded-lg p-4">
+                        <h2 class="text-xl font-bold mb-2">Order ID: <%= order._id %></h2>
+                        <div class="space-y-4">
+                            <div class="text-lg font-semibold">Items:</div>
+                            <div class="space-y-2">
+                                <% order.itemsOrder.forEach(item => { %>
+                                    <div class="flex items-start space-x-4">
+                                        <img src="<%= item.itemId.image %>" alt="<%= item.itemId.itemName %>" class="w-16 h-16 object-cover rounded-md">
+                                        <div>
+                                            <p class="text-lg font-medium"><%= item.itemId.itemName %></p>
+                                            <p class="text-gray-600">Points Required: <%= item.itemId.pointsRequired %></p>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <p class="font-semibold">Total Points Required: <%= order.totalPointsRequired %></p>
+                            <p class="font-semibold">Status: 
+                                <% if (order.status === 'pending') { %>
+                                    <span class="text-yellow-500">Pending</span>
+                                <% } else if (order.status === 'completed') { %>
+                                    <span class="text-green-500">Completed</span>
+                                <% } else { %>
+                                    <span class="text-red-500">Cancelled</span>
+                                <% } %>
+                            </p>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <p class="text-gray-700">You have no reward orders.</p>
+        <% } %>
+    </div>
+    <script>
+        // Toggle mobile menu visibility
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            var menu = document.getElementById('mobile-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

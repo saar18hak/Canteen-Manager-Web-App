@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post New Reward Item</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-gray-800 text-white shadow-md">
+        <div class="container mx-auto flex items-center justify-between p-4">
+            <!-- Logo -->
+            <a href="#" class="text-2xl font-bold">MealMate</a>
+
+            <!-- Navigation Links -->
+            <div class="hidden md:flex space-x-4">
+                <a href="/" class="hover:bg-gray-700 px-3 py-2 rounded">Home</a>
+                <a href="/menu" class="hover:bg-gray-700 px-3 py-2 rounded">Menu</a>
+                <a href="/orders" class="hover:bg-gray-700 px-3 py-2 rounded">Orders</a>
+                <a href="/profile" class="hover:bg-gray-700 px-3 py-2 rounded">Profile</a>
+                <a href="/logout" class="hover:bg-gray-700 px-3 py-2 rounded">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-8">
+        <h1 class="text-2xl font-bold mb-4">Post New Reward Item</h1>
+
+        <form action="/rewardItempost" method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="itemName">
+                    Item Name
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="itemName" type="text" name="itemName" placeholder="Enter item name" >
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
+                    Description
+                </label>
+                <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="description" name="description" placeholder="Enter item description" ></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="pointsRequired">
+                    Points Required
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="pointsRequired" type="number" name="pointsRequired" placeholder="Enter points required" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="image">
+                    Image URL
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="image" type="text" name="image" placeholder="Enter image URL" required>
+            </div>
+           
+            <div class="flex items-center justify-between">
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                    Post Reward Item
+                </button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

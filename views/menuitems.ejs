@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Item Admin Page</title>
+    
+</head>
+<body>
+    <h1>Menu items</h1>
+    <!-- <h2>Item Name:</h2> -->
+    <% items.forEach(function(val) { %>
+        <div>
+            <img src="<%= val.image %>" alt="Item image">
+            <h1>Item name: <%= val.itemname %></h1>
+            <h1>Price: <%= val.price %></h1>
+            <h2 style="color: <%= val.available ? 'green' : 'red' %>">
+                Status: <%= val.available ? 'Available' : 'Not Available' %>
+            </h2>
+            <label>
+                <input type="checkbox" name="status" <%= val.available ? 'checked' : '' %> 
+                onchange="fetch(`/itemavail/<%= val._id %>`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ available: this.checked })
+                }).then(response => response.json())
+                .then(data => { console.log(data); location.reload(); })
+                .catch(error => console.error('Error:', error));">
+                Available
+            </label>
+        </div>
+    <% }); %>
+</body>
+</html>
